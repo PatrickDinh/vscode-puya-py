@@ -1,0 +1,16 @@
+{
+  "name": "typescript-workspace",
+  "version": "1.0.0",
+  "description": "",
+  "main": "index.ts",
+  "scripts": {},
+  "engines": {
+    "node": ">=22.0",
+    "npm": ">=9.0"
+  },
+  "dependencies": {},
+  "devDependencies": {
+    "@tsconfig/node22": "^22.0.0",
+    "typescript": "^5.7.3"
+  }
+}
