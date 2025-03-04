@@ -6,15 +6,13 @@ src/**/*
 .gitignore
 .yarnrc
 esbuild.mjs
-vsc-extension-quickstart.md
 **/tsconfig.json
-**/eslint.config.mjs
 **/*.map
 **/*.ts
 **/.vscode-test.*
 examples
 images/**/*
 !images/icon.png
-.releaserc.json
+release.config.mjs
 ../../**
 ../**

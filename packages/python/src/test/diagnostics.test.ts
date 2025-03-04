@@ -1,6 +1,6 @@
 import * as vscode from 'vscode'
 import * as assert from 'assert'
-import { getDocUri, activate, doc } from '../../common/src/test/helper'
+import { getDocUri, activate, doc } from 'common/test/helper'
 
 const extensionId = 'AlgorandFoundation.algorand-typescript-vscode'
 

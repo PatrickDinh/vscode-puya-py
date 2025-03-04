@@ -15,9 +15,6 @@ runs:
     - run: npm run audit
       shell: bash
 
-    - run: npm run build
-      shell: bash
-
     - name: Run tests (Linux)
       run: xvfb-run -a npm test
       if: runner.os == 'Linux'
@@ -26,4 +23,8 @@ runs:
     - name: Run tests (Non-Linux)
       run: npm test
       if: runner.os != 'Linux'
+      shell: bash
+
+    # Tests need to be run before build, as tests build to the same location
+    - run: npm run build
       shell: bash

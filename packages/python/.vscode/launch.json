@@ -11,7 +11,7 @@
       "request": "launch",
       "runtimeExecutable": "${execPath}",
       "args": ["--extensionDevelopmentPath=${workspaceFolder}", "${workspaceFolder}/examples/algorand-python"],
-      "outFiles": ["${workspaceRoot}/dist/extension.js"],
+      "outFiles": ["${workspaceFolder}/dist/extension.js"],
       "autoAttachChildProcesses": true,
       "preLaunchTask": "npm: build-dev"
     },
@@ -21,9 +21,22 @@
       "request": "launch",
       "runtimeExecutable": "${execPath}",
       "args": ["--extensionDevelopmentPath=${workspaceFolder}", "${workspaceFolder}/examples/python"],
-      "outFiles": ["${workspaceRoot}/dist/extension.js"],
+      "outFiles": ["${workspaceFolder}/dist/extension.js"],
       "autoAttachChildProcesses": true,
       "preLaunchTask": "npm: build-dev"
     },
+    {
+      "name": "Debug Tests",
+      "type": "extensionHost",
+      "request": "launch",
+      "runtimeExecutable": "${execPath}",
+      "args": [
+        "--extensionDevelopmentPath=${workspaceFolder}",
+        "--extensionTestsPath=${workspaceFolder}/out/common/src/test/run",
+        "${workspaceFolder}/src/test/workspace"
+      ],
+      "outFiles": ["${workspaceFolder}/out/python/src/test/**/*.js"],
+      "preLaunchTask": "npm: pretest"
+    }
   ]
 }

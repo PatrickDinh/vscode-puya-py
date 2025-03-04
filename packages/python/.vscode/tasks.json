@@ -17,6 +17,21 @@
       "options": {
         "cwd": "${workspaceFolder}"
       }
+    },
+    {
+      "type": "shell",
+      "command": "npm",
+      "args": ["run", "pretest"],
+      "group": {
+        "kind": "build",
+        "isDefault": true
+      },
+      "problemMatcher": "$esbuild-watch",
+      "isBackground": false,
+      "label": "npm: pretest",
+      "options": {
+        "cwd": "${workspaceFolder}"
+      }
     }
   ]
 }

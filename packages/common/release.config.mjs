@@ -76,7 +76,7 @@ export default {
   processCommits(commitsWithFilePaths) {
     return commitsWithFilePaths.filter((commitWithFilePath) => {
       return commitWithFilePath.filePaths.some(
-        (filePath) => filePath.startsWith('packages/common/') /* || filePath.startsWith('packages/python/')*/
+        (filePath) => filePath.startsWith('packages/common/')
       )
     })
   },

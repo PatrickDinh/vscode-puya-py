@@ -2,6 +2,7 @@ import * as path from 'path'
 import * as Mocha from 'mocha'
 import { glob } from 'glob'
 
+// This function name is important, do not change it
 export function run(): Promise<void> {
   // Create the mocha test
   const mocha = new Mocha({
@@ -10,9 +11,9 @@ export function run(): Promise<void> {
   })
   mocha.timeout(100000)
 
-  const testsRoot = __dirname
+  const testsRoot = process.cwd()
 
-  return glob.glob('**.test.js', { cwd: testsRoot }).then(async (files) => {
+  return glob.glob('**/*.test.js', { cwd: testsRoot }).then(async (files) => {
     // Add files to the test suite
     files.forEach((f) => mocha.addFile(path.resolve(testsRoot, f)))
 

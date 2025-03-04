@@ -42,7 +42,11 @@
     "build:check-types": "tsc --noEmit",
     "build:dev": "run-s build:clean build:check-types && node ../common/esbuild.mjs",
     "build:prod": "run-s build:clean build:check-types && node ../common/esbuild.mjs --production",
-    "test": "",
+    "pretest": "run-s pretest:*",
+    "pretest:build-extension": "npm run build:dev",
+    "pretest:clean": "rimraf out",
+    "pretest:build-tests": "tsc --outDir out && tsc-alias --outDir out",
+    "test": "cross-env CODE_TESTS_WORKSPACE=\"src/test/workspace\" node \"out/typescript/src/test/index\"",
     "create-release": "semantic-release-monorepo",
     "pre-commit": "run-s build:check-types lint:fix audit test",
     "package": "vsce package"
@@ -51,7 +55,7 @@
   "devDependencies": {},
   "main": "dist/extension.js",
   "activationEvents": [
-    "onLanguage:python",
+    "onLanguage:typescript",
     "onCommand:extension.algorandTypescript.restartLanguageServer"
   ],
   "workspaceTrust": {
@@ -62,11 +66,11 @@
       {
         "command": "algorandTypescript.restartLanguageServer",
         "title": "Restart Language Server",
-        "category": "Algorand Python"
+        "category": "Algorand TypeScript"
       }
     ],
     "configuration": {
-      "title": "Algorand Python",
+      "title": "Algorand TypeScript",
       "properties": {
         "algorandTypescript.languageServerPath": {
           "scope": "machine-overridable",
@@ -75,7 +79,7 @@
             "null"
           ],
           "default": null,
-          "description": "Optional path to the directory containing the PuyaPy language server."
+          "description": "Optional path to the directory containing the PuyaTS language server."
         }
       }
     }
