@@ -3,11 +3,14 @@ import tseslint from 'typescript-eslint'
 import prettier from 'eslint-config-prettier'
 
 export default tseslint.config(
+  {
+    ignores: ['**/src/test/workspace/**', '**/test/workspace/**']
+  },
   eslint.configs.recommended,
   tseslint.configs.recommended,
+  prettier,
   {
     files: ['**/*.{js,ts}'],
-    ignores: ['dist/**', 'out/**', '.vscode-test/**'],
     languageOptions: {
       parser: tseslint.parser,
       ecmaVersion: 2020,
@@ -29,5 +32,7 @@ export default tseslint.config(
       '@typescript-eslint/no-empty-object-type': 'off',
     },
   },
-  prettier
+  {
+    ignores: ['**/test/workspace/']
+  }
 )

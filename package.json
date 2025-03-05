@@ -16,7 +16,8 @@
     "audit": "npm run audit --workspaces",
     "build": "npm run build --workspaces",
     "test": "npm run test --workspaces",
-    "create-release": "npm run create-release --workspaces"
+    "create-release": "npm run create-release --workspaces",
+    "pre-commit": "npm run pre-commit --workspaces"
   },
   "dependencies": {
     "vscode-languageclient": "^9.0.1"
