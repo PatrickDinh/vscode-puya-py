@@ -8,7 +8,7 @@ import {
 } from 'vscode-languageclient/node'
 import { exec } from 'child_process'
 import { PythonConfig, getPythonEnvironment } from './environment'
-import { startedInDebugMode } from 'common/utils/started-in-debug-mode'
+import { getDebugLspPort } from 'common/utils/get-debug-lsp-port'
 
 const languageServerName = 'Algorand Python Language Server'
 
@@ -109,9 +109,10 @@ export async function startLanguageServer(workspaceFolder: WorkspaceFolder) {
     return
   }
 
-  const serverOptions: ServerOptions = startedInDebugMode()
+  const lspPort = getDebugLspPort()
+  const serverOptions: ServerOptions = lspPort
     ? async () => {
-        const transport = createServerSocketTransport(8888)
+        const transport = createServerSocketTransport(lspPort)
         return { reader: transport[0], writer: transport[1] }
       }
     : {

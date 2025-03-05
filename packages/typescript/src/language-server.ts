@@ -7,7 +7,7 @@ import {
   ServerOptions,
   TransportKind,
 } from 'vscode-languageclient/node'
-import { startedInDebugMode } from 'common/utils/started-in-debug-mode'
+import { getDebugLspPort } from 'common/utils/get-debug-lsp-port'
 
 const languageServerName = 'Algorand TypeScript Language Server'
 
@@ -18,9 +18,10 @@ export async function startLanguageServer(workspaceFolder: WorkspaceFolder) {
     return
   }
 
-  const serverOptions: ServerOptions = startedInDebugMode()
+  const lspPort = getDebugLspPort()
+  const serverOptions: ServerOptions = lspPort
     ? async () => {
-        const transport = await createClientSocketTransport(8888)
+        const transport = await createClientSocketTransport(lspPort)
         const protocol = await transport.onConnected()
         return { reader: protocol[0], writer: protocol[1] }
       }

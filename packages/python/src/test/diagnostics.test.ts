@@ -5,7 +5,7 @@ import { getDocUri, activate, doc } from 'common/test/helper'
 const extensionId = 'AlgorandFoundation.algorand-typescript-vscode'
 
 // Skip until we integrate with pupapy
-suite.skip('Diagnostics', () => {
+suite('Diagnostics', () => {
   const docUri = getDocUri('diagnostics.py')
 
   test('Should get diagnostics', async () => {

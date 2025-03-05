@@ -11,7 +11,7 @@ export function run(): Promise<void> {
   })
   mocha.timeout(100000)
 
-  const testsRoot = process.cwd()
+  const testsRoot = path.resolve(__dirname, '../../../')
 
   return glob.glob('**/*.test.js', { cwd: testsRoot }).then(async (files) => {
     // Add files to the test suite
