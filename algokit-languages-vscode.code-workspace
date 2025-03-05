@@ -1,0 +1,36 @@
+{
+  "folders": [
+    {
+      "path": "./",
+      "name": "ROOT"
+    },
+    {
+      "path": "packages/python"
+    },
+    {
+      "path": "packages/typescript"
+    },
+    {
+      "path": "packages/common"
+    }
+  ],
+  "settings": {
+    "files.exclude": {
+      "packages/": true
+    },
+    "search.exclude": {
+      "out": true, // set this to false to include "out" folder in search results
+      "dist": true // set this to false to include "dist" folder in search results
+    }
+  },
+  "extensions": {
+    "recommendations": [
+      "editorconfig.editorconfig",
+      "dbaeumer.vscode-eslint",
+      "connor4312.esbuild-problem-matchers",
+      "ms-vscode.extension-test-runner",
+      "esbenp.prettier-vscode",
+      "joshx.workspace-terminals"
+    ]
+  }
+}
