@@ -10,6 +10,6 @@
       "common/*": ["../common/src/*"]
     }
   },
-  "include": ["src/**/*.ts"],
+  "include": ["src/**/*.ts", "../common/src/**/*.ts"],
   "exclude": ["node_modules"]
 }
