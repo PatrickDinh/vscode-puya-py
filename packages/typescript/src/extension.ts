@@ -24,7 +24,6 @@ async function restartLanguageServerCommand() {
   }
 
   await restartLanguageServer(folder)
-  window.showInformationMessage('Algorand TypeScript language server restarted successfully')
 }
 
 export async function activate(context: ExtensionContext) {
