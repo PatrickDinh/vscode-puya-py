@@ -1,0 +1,9 @@
+# Changes here will be overwritten by Copier; NEVER EDIT MANUALLY
+_commit: 0.1.6-1-geb303fd
+_src_path: https://github.com/algorandfoundation/algokit-typescript-template
+author_email: neil.campbell@makerx.com.au
+author_name: Neil Campbell
+contract_name: hello_world
+preset_name: starter
+project_name: algorand-typescript
+
