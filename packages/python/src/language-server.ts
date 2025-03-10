@@ -112,6 +112,8 @@ export async function startLanguageServer(workspaceFolder: WorkspaceFolder) {
   const lspPort = getDebugLspPort()
   const serverOptions: ServerOptions = lspPort
     ? async () => {
+        // The method name createServerSocketTransport is misleading.
+        // This makes the extension becomes the client of the websocket connection.
         const transport = createServerSocketTransport(lspPort)
         return { reader: transport[0], writer: transport[1] }
       }
