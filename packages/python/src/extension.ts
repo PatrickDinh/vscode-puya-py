@@ -1,21 +1,23 @@
-import { workspace, ExtensionContext, window, TextDocument, Uri, commands } from 'vscode'
+import { workspace, ExtensionContext, window, TextDocument, commands, Uri } from 'vscode'
 import { PythonExtension } from '@vscode/python-extension'
 import { startLanguageServer, restartLanguageServer, stopAllLanguageServers } from './language-server'
 
 async function onDocumentOpenedHandler(context: ExtensionContext, document: TextDocument) {
+  console.log(`>>>> OPENED ${document.uri.toString()}`)
   if (document.languageId === 'python') {
     const folder = workspace.getWorkspaceFolder(document.uri)
     if (folder) {
       await startLanguageServer(folder)
 
       // Handle language server path configuration changes
-      context.subscriptions.push(
-        workspace.onDidChangeConfiguration(async (event) => {
-          if (event.affectsConfiguration('algorandPython.languageServerPath', folder)) {
-            await restartLanguageServer(folder)
-          }
-        })
-      )
+      // TODO: NC - This should be elsewhere, as it may setup multiple handlers
+      // context.subscriptions.push(
+      //   workspace.onDidChangeConfiguration(async (event) => {
+      //     if (event.affectsConfiguration('algorandPython.languageServerPath', folder)) {
+      //       await restartLanguageServer(folder)
+      //     }
+      //   })
+      // )
     }
   }
 }
@@ -45,6 +47,7 @@ async function restartLanguageServerCommand() {
 }
 
 export async function activate(context: ExtensionContext) {
+  console.log('>>>> ACTIVATE')
   // TODO: check if the python extension is installed
   const pythonApi = await PythonExtension.api()
 
@@ -66,6 +69,7 @@ export async function activate(context: ExtensionContext) {
   // Handle interpreter changes
   context.subscriptions.push(
     pythonApi.environments.onDidChangeActiveEnvironmentPath(async (e) => {
+      console.log('>>>> PYTHON CHANGED')
       if (e.resource) {
         // TODO: what happen if the resource is undefined?
         await onPythonEnvironmentChangedHandler(e.resource.uri)
@@ -84,5 +88,6 @@ export async function activate(context: ExtensionContext) {
 }
 
 export async function deactivate(): Promise<void> {
+  console.log('>>>> DEACTIVATE')
   await stopAllLanguageServers()
 }

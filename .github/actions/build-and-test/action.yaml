@@ -25,8 +25,7 @@ runs:
       run: |
         pip install --user pipx
         pipx ensurepath
-        pipx install poetry ${{ runner.os == 'macOS' && '--python "$Python_ROOT_DIR/bin/python"' || '' }}
-        pipx inject poetry poetry-plugin-export
+        pipx install poetry
       shell: bash
 
     - name: Run tests (Linux)

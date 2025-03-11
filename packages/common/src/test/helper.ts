@@ -13,16 +13,19 @@ export let platformEol: string
 // TODO: NC - Need to ensure we can support a non .venv setup
 export async function activate(extensionId: string, docUri: vscode.Uri) {
   // The extensionId is `publisher.name` from package.json
-  const ext = vscode.extensions.getExtension(extensionId)!
-  await ext.activate()
-  try {
-    doc = await vscode.workspace.openTextDocument(docUri)
-    editor = await vscode.window.showTextDocument(doc)
-    await sleep(5_000) // Wait for server activation and results to be returned
-  } catch (e) {
-    // eslint-disable-next-line no-console
-    console.error(e)
-  }
+  // const ext = vscode.extensions.getExtension(extensionId)!
+  // await ext.activate()
+  doc = await vscode.workspace.openTextDocument(docUri)
+  await vscode.window.showTextDocument(doc)
+  await sleep(10_000) // Wait for server activation
+  await vscode.commands.executeCommand('workbench.action.closeActiveEditor') // Close the document
+  await sleep(10_000)
+  editor = await vscode.window.showTextDocument(doc)
+  await sleep(10_000) // Wait for results to be returned
+
+  vscode.window.visibleTextEditors.forEach((e) => {
+    console.log(`>>>>>${e.document.getText().length}:${e.document.languageId}: ${e.document.uri.toString()}`)
+  })
 }
 
 async function sleep(ms: number) {

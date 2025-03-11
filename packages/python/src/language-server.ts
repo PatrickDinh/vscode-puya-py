@@ -63,7 +63,7 @@ async function findStartServerCommand(config: PythonConfig): Promise<ServerComma
 export async function restartLanguageServer(workspaceFolder: WorkspaceFolder) {
   const client = clients.get(workspaceFolder.name)
   if (client) {
-    await client.stop()
+    await client.stop(5_000)
     clients.delete(workspaceFolder.name)
   }
 
@@ -71,11 +71,18 @@ export async function restartLanguageServer(workspaceFolder: WorkspaceFolder) {
 }
 
 export async function startLanguageServer(workspaceFolder: WorkspaceFolder) {
+  // TODO: NC - Need to support 1 per workspace
+  const outputChannel = window.createOutputChannel(languageServerName)
+
+  outputChannel.appendLine(`>>>> Starting the Algorand Python language server for ${workspaceFolder.name}`)
+
   if (clients.has(workspaceFolder.name)) {
     return
   }
 
   const pythonConfig = await getPythonEnvironment(workspaceFolder?.uri)
+
+  outputChannel.appendLine(`>>>> Python ${JSON.stringify(pythonConfig)}`)
 
   if (!pythonConfig || !pythonConfig.envPath || !pythonConfig.pythonPath) {
     return
@@ -101,8 +108,6 @@ export async function startLanguageServer(workspaceFolder: WorkspaceFolder) {
   } else {
     startServerCommand = await findStartServerCommand(pythonConfig)
   }
-
-  const outputChannel = window.createOutputChannel(languageServerName)
 
   if (!startServerCommand) {
     outputChannel.appendLine(`The Algorand Python language server was not found in the current environment.`)
@@ -154,15 +159,17 @@ export async function startLanguageServer(workspaceFolder: WorkspaceFolder) {
 
   try {
     // Start the client. This will also launch the server
+    outputChannel.appendLine('>>>> client.start() called')
     await client.start()
     clients.set(workspaceFolder.name, client)
   } catch {
+    outputChannel.appendLine('Failed to start the Algorand Python language server.')
     window.showErrorMessage('Failed to start the Algorand Python language server.')
   }
 }
 
 export async function stopAllLanguageServers(): Promise<void> {
-  const promises = Array.from(clients.values()).map((client) => client.stop())
+  const promises = Array.from(clients.values()).map((client) => client.stop(5_000))
   await Promise.all(promises)
   clients.clear()
 }
