@@ -9,6 +9,8 @@ export let platformEol: string
 /**
  * Activates the vscode-puya-py extension
  */
+
+// TODO: NC - Need to ensure we can support a non .venv setup
 export async function activate(extensionId: string, docUri: vscode.Uri) {
   // The extensionId is `publisher.name` from package.json
   const ext = vscode.extensions.getExtension(extensionId)!
@@ -16,7 +18,7 @@ export async function activate(extensionId: string, docUri: vscode.Uri) {
   try {
     doc = await vscode.workspace.openTextDocument(docUri)
     editor = await vscode.window.showTextDocument(doc)
-    await sleep(2000) // Wait for server activation
+    await sleep(5_000) // Wait for server activation and results to be returned
   } catch (e) {
     // eslint-disable-next-line no-console
     console.error(e)

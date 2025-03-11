@@ -2,27 +2,27 @@ import * as vscode from 'vscode'
 import * as assert from 'assert'
 import { getDocUri, activate, doc } from 'common/test/helper'
 
-const extensionId = 'AlgorandFoundation.algorand-typescript-vscode'
+const extensionId = 'AlgorandFoundation.algorand-python-vscode'
 
-// Skip until we integrate with pupapy
-suite.skip('Diagnostics', () => {
+suite('Diagnostics', () => {
   const docUri = getDocUri('diagnostics.py')
 
   test('Should get diagnostics', async () => {
     await testDiagnostics(docUri, [
       {
-        message: "Python list isn't supported in Algorand Python",
-        range: toRange(0, 4, 0, 9),
+        message: `Incompatible return value type (got "int", expected "UInt64")  [return-value]`,
+        range: toRange({ startLine: 8, startChar: 0, endLine: 8, endChar: 17 }),
         severity: vscode.DiagnosticSeverity.Error,
         source: 'ex',
       },
     ])
   })
 
-  test('Should fix the issue', async () => {
+  // Skip until code actions are available
+  test.skip('Should fix the issue', async () => {
     await activate(extensionId, docUri)
 
-    const range = toRange(0, 4, 0, 9)
+    const range = toRange({ startLine: 7, startChar: 0, endLine: 7, endChar: 17 })
 
     // Execute the code action provider command to retrieve action list.
     const codeActions = await vscode.commands.executeCommand<vscode.CodeAction[]>(
@@ -38,16 +38,17 @@ suite.skip('Diagnostics', () => {
   })
 })
 
-function toRange(sLine: number, sChar: number, eLine: number, eChar: number) {
-  const start = new vscode.Position(sLine, sChar)
-  const end = new vscode.Position(eLine, eChar)
+function toRange(params: { startLine: number; startChar: number; endLine: number; endChar: number }) {
+  const { startLine, startChar, endLine, endChar } = params
+  const start = new vscode.Position(startLine, startChar)
+  const end = new vscode.Position(endLine, endChar)
   return new vscode.Range(start, end)
 }
 
 async function testDiagnostics(docUri: vscode.Uri, expectedDiagnostics: vscode.Diagnostic[]) {
   await activate(extensionId, docUri)
 
-  const actualDiagnostics = vscode.languages.getDiagnostics(docUri)
+  const actualDiagnostics = vscode.languages.getDiagnostics(docUri).filter((diagnostic) => diagnostic.source === 'puyapy-lsp')
   assert.equal(actualDiagnostics.length, expectedDiagnostics.length)
 
   expectedDiagnostics.forEach((expectedDiagnostic, i) => {

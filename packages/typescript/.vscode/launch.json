@@ -35,9 +35,11 @@
       "args": [
         "--extensionDevelopmentPath=${workspaceFolder}",
         "--extensionTestsPath=${workspaceFolder}/out/common/src/test/run",
+        "--disable-extension=vsls-contrib.codetour",
         "${workspaceFolder}/src/test/workspace"
       ],
       "outFiles": ["${workspaceFolder}/out/**/*.js"],
+      "autoAttachChildProcesses": true,
       "preLaunchTask": "npm: pretest",
       // "env": { "ALGORAND_LSP_PORT": "8888" }
     }
