@@ -12,7 +12,7 @@ import {
 } from 'vscode-languageclient/node'
 import { getDebugLspPort } from 'common/utils/get-debug-lsp-port'
 
-const languageServerName = 'Algorand TypeScript Language Server'
+const algorandTypeScript = 'Algorand TypeScript'
 const clients: Map<string, LanguageClient> = new Map()
 const outputChannels: Map<string, OutputChannel> = new Map()
 
@@ -21,7 +21,7 @@ const getOutputChannel = (workspaceFolder: WorkspaceFolder) => {
     return outputChannels.get(workspaceFolder.name)!
   }
 
-  const outputChannel = window.createOutputChannel(`${languageServerName} - ${workspaceFolder.name}`)
+  const outputChannel = window.createOutputChannel(`${algorandTypeScript} - ${workspaceFolder.name}`)
   outputChannels.set(workspaceFolder.name, outputChannel)
   return outputChannel
 }
@@ -39,7 +39,7 @@ const getDebugErrorHandler = (): ErrorHandler  => {
 
 const lspPort = getDebugLspPort()
 
-export async function startLanguageServer(workspaceFolder: WorkspaceFolder) {
+export async function startLanguageClient(workspaceFolder: WorkspaceFolder) {
   if (clients.has(workspaceFolder.name)) {
     return
   }
@@ -77,25 +77,25 @@ export async function startLanguageServer(workspaceFolder: WorkspaceFolder) {
 
   const client = new LanguageClient(
     `pupats-${workspaceFolder.name}`,
-    `${languageServerName} - ${workspaceFolder.name}`,
+    `${algorandTypeScript} - ${workspaceFolder.name}`,
     serverOptions,
     clientOptions
   )
 
   try {
-    outputChannel.appendLine(`Starting language server for ${workspaceFolder.name}...`);
+    outputChannel.appendLine(`Starting server for ${workspaceFolder.name}.`);
 
     // Start the client. This will also launch the server
     await client.start()
     clients.set(workspaceFolder.name, client)
   } catch {
-    window.showErrorMessage('Failed to start Algorand TypeScript language server.')
+    window.showErrorMessage('Failed to start Algorand TypeScript server.')
   }
 }
 
-export async function restartLanguageServer(workspaceFolder: WorkspaceFolder) {
+export async function restartLanguageClient(workspaceFolder: WorkspaceFolder) {
   if (lspPort) {
-    window.showInformationMessage('Language server is running in debug mode. It will not be restarted.')
+    window.showInformationMessage('Server is running in debug mode. It will not be restarted.')
     return
   }
 
@@ -105,11 +105,11 @@ export async function restartLanguageServer(workspaceFolder: WorkspaceFolder) {
     clients.delete(workspaceFolder.name)
   }
 
-  await startLanguageServer(workspaceFolder)
-  window.showInformationMessage('Algorand TypeScript language server restarted successfully')
+  await startLanguageClient(workspaceFolder)
+  window.showInformationMessage('Algorand TypeScript server restarted successfully')
 }
 
-export async function stopAllLanguageServers(): Promise<void> {
+export async function stopAllLanguageClients(): Promise<void> {
   const promises = Array.from(clients.values()).map((client) => client.stop())
   await Promise.all(promises)
   clients.clear()

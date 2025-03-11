@@ -56,7 +56,7 @@
   "main": "dist/extension.js",
   "activationEvents": [
     "onLanguage:typescript",
-    "onCommand:extension.algorandTypescript.restartLanguageServer"
+    "onCommand:extension.algorandTypescript.restartLanguageClient"
   ],
   "workspaceTrust": {
     "request": "never"
@@ -64,8 +64,8 @@
   "contributes": {
     "commands": [
       {
-        "command": "algorandTypescript.restartLanguageServer",
-        "title": "Restart Language Server",
+        "command": "algorandTypescript.restartLanguageClient",
+        "title": "Restart Server",
         "category": "Algorand TypeScript"
       }
     ],

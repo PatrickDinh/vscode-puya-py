@@ -1,16 +1,16 @@
 import { workspace, ExtensionContext, window, TextDocument, commands } from 'vscode'
-import { startLanguageServer, restartLanguageServer, stopAllLanguageServers } from './language-server'
+import { startLanguageClient, restartLanguageClient as restartLanguageClient, stopAllLanguageClients } from './language-client'
 
 async function onDocumentOpenedHandler(context: ExtensionContext, document: TextDocument) {
   if (document.languageId === 'typescript' && document.uri.fsPath.endsWith('algo.ts')) {
     const folder = workspace.getWorkspaceFolder(document.uri)
     if (folder) {
-      await startLanguageServer(folder)
+      await startLanguageClient(folder)
     }
   }
 }
 
-async function restartLanguageServerCommand() {
+async function restartLanguageClientCommand() {
   const editor = window.activeTextEditor
   if (!editor) {
     window.showErrorMessage('No active editor found')
@@ -23,12 +23,12 @@ async function restartLanguageServerCommand() {
     return
   }
 
-  await restartLanguageServer(folder)
+  await restartLanguageClient(folder)
 }
 
 export async function activate(context: ExtensionContext) {
   // Register restart command
-  context.subscriptions.push(commands.registerCommand('algorandTypescript.restartLanguageServer', restartLanguageServerCommand))
+  context.subscriptions.push(commands.registerCommand('algorandTypescript.restartLanguageClient', restartLanguageClientCommand))
 
   // Handle already opened documents
   if (window.activeTextEditor?.document) {
@@ -46,12 +46,12 @@ export async function activate(context: ExtensionContext) {
   context.subscriptions.push(
     workspace.onDidChangeWorkspaceFolders(async (event) => {
       for (const folder of event.removed) {
-        await restartLanguageServer(folder)
+        await restartLanguageClient(folder)
       }
     })
   )
 }
 
 export async function deactivate(): Promise<void> {
-  await stopAllLanguageServers()
+  await stopAllLanguageClients()
 }
