@@ -26,7 +26,7 @@ const getOutputChannel = (workspaceFolder: WorkspaceFolder) => {
   return outputChannel
 }
 
-const getDebugErrorHandler = (): ErrorHandler  => {
+const getDebugErrorHandler = (): ErrorHandler => {
   return {
     error() {
       return { action: ErrorAction.Continue, handled: true }
@@ -83,7 +83,7 @@ export async function startLanguageClient(workspaceFolder: WorkspaceFolder) {
   )
 
   try {
-    outputChannel.appendLine(`Starting server for ${workspaceFolder.name}.`);
+    outputChannel.appendLine(`Starting server for ${workspaceFolder.name}.`)
 
     // Start the client. This will also launch the server
     await client.start()
