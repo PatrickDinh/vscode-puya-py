@@ -46,6 +46,7 @@
     "pretest:build-extension": "npm run build:dev",
     "pretest:clean": "rimraf out",
     "pretest:build-tests": "tsc --outDir out && tsc-alias --outDir out",
+    "pretest:setup-workspace": "cd ./src/test/workspace && poetry install && cd ../../../",
     "test": "cross-env CODE_TESTS_WORKSPACE=\"src/test/workspace\" node \"out/python/src/test/index\"",
     "create-release": "semantic-release-monorepo",
     "pre-commit": "run-s build:check-types lint:fix audit test",

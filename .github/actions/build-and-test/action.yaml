@@ -15,6 +15,19 @@ runs:
     - run: npm run audit
       shell: bash
 
+    # The workspace used in the python tests requires Python and Poetry
+    - name: Set up Python 3.12
+      uses: actions/setup-python@v5
+      with:
+        python-version: "3.12"
+
+    - name: Set up Poetry
+      run: |
+        pip install --user pipx
+        pipx ensurepath
+        pipx install poetry
+      shell: bash
+
     - name: Run tests (Linux)
       run: xvfb-run -a npm test
       if: runner.os == 'Linux'

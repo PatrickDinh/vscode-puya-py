@@ -1,18 +1,20 @@
-import { workspace, ExtensionContext, window, TextDocument, Uri, commands } from 'vscode'
+import { workspace, ExtensionContext, window, TextDocument, commands, Uri } from 'vscode'
 import { PythonExtension } from '@vscode/python-extension'
-import { startLanguageServer, restartLanguageServer, stopAllLanguageServers } from './language-server'
+import { PythonLanguageClient } from './language-client'
+
+const client = new PythonLanguageClient()
 
 async function onDocumentOpenedHandler(context: ExtensionContext, document: TextDocument) {
   if (document.languageId === 'python') {
     const folder = workspace.getWorkspaceFolder(document.uri)
     if (folder) {
-      await startLanguageServer(folder)
+      await client.start(folder)
 
       // Handle language server path configuration changes
       context.subscriptions.push(
         workspace.onDidChangeConfiguration(async (event) => {
           if (event.affectsConfiguration('algorandPython.languageServerPath', folder)) {
-            await restartLanguageServer(folder)
+            await client.restart(folder)
           }
         })
       )
@@ -23,7 +25,7 @@ async function onDocumentOpenedHandler(context: ExtensionContext, document: Text
 async function onPythonEnvironmentChangedHandler(resource: Uri) {
   const folder = workspace.getWorkspaceFolder(resource)
   if (folder) {
-    await restartLanguageServer(folder)
+    await client.restart(folder)
   }
 }
 
@@ -40,7 +42,7 @@ async function restartLanguageServerCommand() {
     return
   }
 
-  await restartLanguageServer(folder)
+  await client.restart(folder)
   window.showInformationMessage('Algorand Python language server restarted successfully')
 }
 
@@ -77,12 +79,12 @@ export async function activate(context: ExtensionContext) {
   context.subscriptions.push(
     workspace.onDidChangeWorkspaceFolders(async (event) => {
       for (const folder of event.removed) {
-        await restartLanguageServer(folder)
+        await client.restart(folder)
       }
     })
   )
 }
 
 export async function deactivate(): Promise<void> {
-  await stopAllLanguageServers()
+  await client.stopAll()
 }
