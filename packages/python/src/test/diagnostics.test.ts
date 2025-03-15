@@ -51,10 +51,6 @@ async function testDiagnostics(docUri: vscode.Uri, expectedDiagnostics: vscode.D
   const allDiagnostics = vscode.languages.getDiagnostics(docUri)
   const actualDiagnostics = allDiagnostics.filter((diagnostic) => diagnostic.source === 'puyapy-lsp')
 
-  actualDiagnostics.forEach((diagnostic) => {
-    console.log(`>>>>> ${diagnostic.message}`)
-  })
-
   assert.equal(allDiagnostics.length > 0, true, 'No diagnostics found')
   assert.equal(actualDiagnostics.length, expectedDiagnostics.length)
 
