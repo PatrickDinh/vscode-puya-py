@@ -42,7 +42,11 @@
     "build:check-types": "tsc --noEmit",
     "build:dev": "run-s build:clean build:check-types && node ../common/esbuild.mjs",
     "build:prod": "run-s build:clean build:check-types && node ../common/esbuild.mjs --production",
-    "test": "",
+    "pretest": "run-s pretest:*",
+    "pretest:build-extension": "npm run build:dev",
+    "pretest:clean": "rimraf out",
+    "pretest:build-tests": "tsc --outDir out && tsc-alias --outDir out",
+    "test": "cross-env CODE_TESTS_WORKSPACE=\"src/test/workspace\" node \"out/typescript/src/test/index\"",
     "create-release": "semantic-release-monorepo",
     "pre-commit": "run-s build:check-types lint:fix audit test",
     "package": "vsce package"

@@ -11,10 +11,11 @@ export let platformEol: string
  */
 
 // TODO: NC - Need to ensure we can support a non .venv setup
-export async function activate(extensionId: string, docUri: vscode.Uri) {
-  // The extensionId is `publisher.name` from package.json
-  // const ext = vscode.extensions.getExtension(extensionId)!
-  // await ext.activate()
+// TODO: NC - Support dynamic results + renames
+export async function activate(_extensionId: string, docUri: vscode.Uri) {
+  // There is currently an issue on in the Algorand Python language server on windows, causing the first run to deadlock.
+  // This flow of opening, waiting, closing, waiting, and reopening the document is a workaround for that issue.
+  // Once that is fixed we should be able to move to an dynamic wait approach like https://github.com/microsoft/vscode-languageserver-node/blob/main/client-node-tests/src/integration.test.ts#L1844
   doc = await vscode.workspace.openTextDocument(docUri)
   await vscode.window.showTextDocument(doc)
   await sleep(10_000) // Wait for server activation
@@ -22,10 +23,6 @@ export async function activate(extensionId: string, docUri: vscode.Uri) {
   await sleep(10_000)
   editor = await vscode.window.showTextDocument(doc)
   await sleep(10_000) // Wait for results to be returned
-
-  vscode.window.visibleTextEditors.forEach((e) => {
-    console.log(`>>>>>${e.document.getText().length}:${e.document.languageId}: ${e.document.uri.toString()}`)
-  })
 }
 
 async function sleep(ms: number) {

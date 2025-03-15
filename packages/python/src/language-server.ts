@@ -11,6 +11,7 @@ import { PythonConfig, getPythonEnvironment } from './environment'
 import { getDebugLspPort } from 'common/utils/get-debug-lsp-port'
 
 const languageServerName = 'Algorand Python Language Server'
+const stopTimeout = 3_000
 
 const clients: Map<string, LanguageClient> = new Map()
 
@@ -63,7 +64,7 @@ async function findStartServerCommand(config: PythonConfig): Promise<ServerComma
 export async function restartLanguageServer(workspaceFolder: WorkspaceFolder) {
   const client = clients.get(workspaceFolder.name)
   if (client) {
-    await client.stop(5_000)
+    await client.stop(stopTimeout)
     clients.delete(workspaceFolder.name)
   }
 
@@ -71,18 +72,13 @@ export async function restartLanguageServer(workspaceFolder: WorkspaceFolder) {
 }
 
 export async function startLanguageServer(workspaceFolder: WorkspaceFolder) {
-  // TODO: NC - Need to support 1 per workspace
-  const outputChannel = window.createOutputChannel(languageServerName)
-
-  outputChannel.appendLine(`>>>> Starting the Algorand Python language server for ${workspaceFolder.name}`)
-
   if (clients.has(workspaceFolder.name)) {
     return
   }
 
+  const clientName = `${languageServerName}${workspaceFolder.name ? ` - ${workspaceFolder.name}` : ''}`
+  const outputChannel = window.createOutputChannel(clientName)
   const pythonConfig = await getPythonEnvironment(workspaceFolder?.uri)
-
-  outputChannel.appendLine(`>>>> Python ${JSON.stringify(pythonConfig)}`)
 
   if (!pythonConfig || !pythonConfig.envPath || !pythonConfig.pythonPath) {
     return
@@ -150,26 +146,19 @@ export async function startLanguageServer(workspaceFolder: WorkspaceFolder) {
     outputChannel,
   }
 
-  const client = new LanguageClient(
-    `pupapy-${workspaceFolder.name}`,
-    `${languageServerName} - ${workspaceFolder.name}`,
-    serverOptions,
-    clientOptions
-  )
+  const client = new LanguageClient(`pupapy-${workspaceFolder.name}`, clientName, serverOptions, clientOptions)
 
   try {
     // Start the client. This will also launch the server
-    outputChannel.appendLine('>>>> client.start() called')
     await client.start()
     clients.set(workspaceFolder.name, client)
   } catch {
-    outputChannel.appendLine('Failed to start the Algorand Python language server.')
     window.showErrorMessage('Failed to start the Algorand Python language server.')
   }
 }
 
 export async function stopAllLanguageServers(): Promise<void> {
-  const promises = Array.from(clients.values()).map((client) => client.stop(5_000))
+  const promises = Array.from(clients.values()).map((client) => client.stop(stopTimeout))
   await Promise.all(promises)
   clients.clear()
 }

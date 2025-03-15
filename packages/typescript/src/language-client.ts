@@ -12,16 +12,17 @@ import {
 } from 'vscode-languageclient/node'
 import { getDebugLspPort } from 'common/utils/get-debug-lsp-port'
 
-const algorandTypeScript = 'Algorand TypeScript'
+const languageServerName = 'Algorand TypeScript Language Server'
 const clients: Map<string, LanguageClient> = new Map()
 const outputChannels: Map<string, OutputChannel> = new Map()
+const stopTimeout = 3_000
 
 const getOutputChannel = (workspaceFolder: WorkspaceFolder) => {
   if (outputChannels.has(workspaceFolder.name)) {
     return outputChannels.get(workspaceFolder.name)!
   }
 
-  const outputChannel = window.createOutputChannel(`${algorandTypeScript} - ${workspaceFolder.name}`)
+  const outputChannel = window.createOutputChannel(`${languageServerName}${workspaceFolder.name ? ` - ${workspaceFolder.name}` : ''}`)
   outputChannels.set(workspaceFolder.name, outputChannel)
   return outputChannel
 }
@@ -75,12 +76,7 @@ export async function startLanguageClient(workspaceFolder: WorkspaceFolder) {
     errorHandler: lspPort ? getDebugErrorHandler() : undefined,
   }
 
-  const client = new LanguageClient(
-    `pupats-${workspaceFolder.name}`,
-    `${algorandTypeScript} - ${workspaceFolder.name}`,
-    serverOptions,
-    clientOptions
-  )
+  const client = new LanguageClient(`pupats-${workspaceFolder.name}`, outputChannel.name, serverOptions, clientOptions)
 
   try {
     outputChannel.appendLine(`Starting server for ${workspaceFolder.name}.`)
@@ -101,7 +97,7 @@ export async function restartLanguageClient(workspaceFolder: WorkspaceFolder) {
 
   const client = clients.get(workspaceFolder.name)
   if (client) {
-    await client.stop()
+    await client.stop(stopTimeout)
     clients.delete(workspaceFolder.name)
   }
 
@@ -110,7 +106,7 @@ export async function restartLanguageClient(workspaceFolder: WorkspaceFolder) {
 }
 
 export async function stopAllLanguageClients(): Promise<void> {
-  const promises = Array.from(clients.values()).map((client) => client.stop())
+  const promises = Array.from(clients.values()).map((client) => client.stop(stopTimeout))
   await Promise.all(promises)
   clients.clear()
 }
