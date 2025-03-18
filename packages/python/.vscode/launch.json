@@ -12,7 +12,6 @@
       "request": "launch",
       "args": [
         "--extensionDevelopmentPath=${workspaceFolder}",
-        "--testing=hello",
         "${workspaceFolder}/examples/algorand-python"
       ],
       "outFiles": ["${workspaceFolder}/dist/extension.js"],
@@ -42,9 +41,11 @@
       "args": [
         "--extensionDevelopmentPath=${workspaceFolder}",
         "--extensionTestsPath=${workspaceFolder}/out/common/src/test/run",
+        "--disable-extension=vsls-contrib.codetour",
         "${workspaceFolder}/src/test/workspace"
       ],
       "outFiles": ["${workspaceFolder}/out/**/*.js"],
+      "autoAttachChildProcesses": true,
       "preLaunchTask": "npm: pretest",
       // "env": { "ALGORAND_LSP_PORT": "8888" }
     }
