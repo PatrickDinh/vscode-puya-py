@@ -1,20 +1,20 @@
 import { workspace, ExtensionContext, window, TextDocument, commands, Uri } from 'vscode'
 import { PythonExtension } from '@vscode/python-extension'
-import { PythonLanguageClient } from './language-client'
+import { PythonLanguageClientManager } from './language-client-manager'
 
-const client = new PythonLanguageClient()
+const clientManager = new PythonLanguageClientManager()
 
 async function onDocumentOpenedHandler(context: ExtensionContext, document: TextDocument) {
   if (document.languageId === 'python') {
     const folder = workspace.getWorkspaceFolder(document.uri)
     if (folder) {
-      await client.start(folder)
+      await clientManager.startClient(folder)
 
       // Handle language server path configuration changes
       context.subscriptions.push(
         workspace.onDidChangeConfiguration(async (event) => {
           if (event.affectsConfiguration('algorandPython.languageServerPath', folder)) {
-            await client.restart(folder)
+            await clientManager.restartClient(folder)
           }
         })
       )
@@ -25,7 +25,7 @@ async function onDocumentOpenedHandler(context: ExtensionContext, document: Text
 async function onPythonEnvironmentChangedHandler(resource: Uri) {
   const folder = workspace.getWorkspaceFolder(resource)
   if (folder) {
-    await client.restart(folder)
+    await clientManager.restartClient(folder)
   }
 }
 
@@ -42,7 +42,7 @@ async function restartLanguageServerCommand() {
     return
   }
 
-  await client.restart(folder)
+  await clientManager.restartClient(folder)
   window.showInformationMessage('Algorand Python language server restarted successfully')
 }
 
@@ -79,12 +79,12 @@ export async function activate(context: ExtensionContext) {
   context.subscriptions.push(
     workspace.onDidChangeWorkspaceFolders(async (event) => {
       for (const folder of event.removed) {
-        await client.restart(folder)
+        await clientManager.restartClient(folder)
       }
     })
   )
 }
 
 export async function deactivate(): Promise<void> {
-  await client.stopAll()
+  await clientManager.stopClients()
 }

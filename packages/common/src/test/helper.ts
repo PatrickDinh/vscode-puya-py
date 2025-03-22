@@ -10,7 +10,6 @@ export let platformEol: string
  * Activates the vscode-puya-py extension
  */
 
-// TODO: NC - Need to ensure we can support a non .venv setup
 // TODO: NC - Support dynamic results + renames
 // TODO: NC - Remove extensionId
 export async function activate(_extensionId: string, docUri: vscode.Uri) {

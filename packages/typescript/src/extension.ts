@@ -1,13 +1,13 @@
 import { workspace, ExtensionContext, window, TextDocument, commands } from 'vscode'
-import { TypeScriptLanguageClient } from './language-client'
+import { TypeScriptLanguageClientManager } from './language-client-manager'
 
-const client = new TypeScriptLanguageClient()
+const clientManager = new TypeScriptLanguageClientManager()
 
 async function onDocumentOpenedHandler(context: ExtensionContext, document: TextDocument) {
   if (document.languageId === 'typescript' && document.uri.fsPath.endsWith('algo.ts')) {
     const folder = workspace.getWorkspaceFolder(document.uri)
     if (folder) {
-      await client.start(folder)
+      await clientManager.startClient(folder)
     }
   }
 }
@@ -25,7 +25,7 @@ async function restartLanguageClientCommand() {
     return
   }
 
-  await client.restart(folder)
+  await clientManager.restartClient(folder)
 }
 
 export async function activate(context: ExtensionContext) {
@@ -48,12 +48,12 @@ export async function activate(context: ExtensionContext) {
   context.subscriptions.push(
     workspace.onDidChangeWorkspaceFolders(async (event) => {
       for (const folder of event.removed) {
-        await client.restart(folder)
+        await clientManager.restartClient(folder)
       }
     })
   )
 }
 
 export async function deactivate(): Promise<void> {
-  await client.stopAll()
+  await clientManager.stopClients()
 }

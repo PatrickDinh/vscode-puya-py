@@ -9,7 +9,7 @@ import {
 } from 'vscode-languageclient/node'
 import { getDebugLspPort } from './utils/get-debug-lsp-port'
 
-export abstract class LanguageClientBase {
+export abstract class LanguageClientManager {
   private clients: Map<string, LanguageClient> = new Map()
   private outputChannels: Map<string, OutputChannel> = new Map()
   private readonly stopTimeout = 3_000
@@ -32,7 +32,7 @@ export abstract class LanguageClientBase {
 
   protected abstract getOptions(workspaceFolder: WorkspaceFolder): Promise<[ServerOptions, LanguageClientOptions] | undefined>
 
-  public async start(workspaceFolder: WorkspaceFolder) {
+  public async startClient(workspaceFolder: WorkspaceFolder) {
     if (this.clients.has(workspaceFolder.name)) {
       return
     }
@@ -69,7 +69,7 @@ export abstract class LanguageClientBase {
     }
   }
 
-  public async restart(workspaceFolder: WorkspaceFolder) {
+  public async restartClient(workspaceFolder: WorkspaceFolder) {
     if (this.lspPort) {
       window.showInformationMessage('Server is running in debug mode. It will not be restarted.')
       return
@@ -81,11 +81,11 @@ export abstract class LanguageClientBase {
       this.clients.delete(workspaceFolder.name)
     }
 
-    await this.start(workspaceFolder)
+    await this.startClient(workspaceFolder)
     window.showInformationMessage(`${this.serverName} restarted successfully`)
   }
 
-  public async stopAll(): Promise<void> {
+  public async stopClients(): Promise<void> {
     const promises = Array.from(this.clients.values()).map((client) => client.stop(this.stopTimeout))
     await Promise.all(promises)
     this.clients.clear()

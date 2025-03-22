@@ -2,14 +2,14 @@ import { workspace, WorkspaceFolder } from 'vscode'
 import { LanguageClientOptions, ServerOptions, TransportKind } from 'vscode-languageclient/node'
 import { exec } from 'child_process'
 import { PythonConfig, getPythonEnvironment } from './environment'
-import { LanguageClientBase } from 'common/language-client-base'
+import { LanguageClientManager } from 'common/language-client-manager'
 
 type ServerCommand = {
   command: string
   args?: string[]
 }
 
-export class PythonLanguageClient extends LanguageClientBase {
+export class PythonLanguageClientManager extends LanguageClientManager {
   constructor() {
     super('Algorand Python', 'puyapy')
   }

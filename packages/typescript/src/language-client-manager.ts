@@ -1,8 +1,8 @@
 import { WorkspaceFolder } from 'vscode'
 import { LanguageClientOptions, ServerOptions, TransportKind } from 'vscode-languageclient/node'
-import { LanguageClientBase } from 'common/language-client-base'
+import { LanguageClientManager } from 'common/language-client-manager'
 
-export class TypeScriptLanguageClient extends LanguageClientBase {
+export class TypeScriptLanguageClientManager extends LanguageClientManager {
   constructor() {
     super('Algorand TypeScript', 'puyats')
   }
