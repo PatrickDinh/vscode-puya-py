@@ -1,8 +1,6 @@
 import * as vscode from 'vscode'
 import * as assert from 'assert'
-import { getDocUri, activate, doc } from 'common/test/helper'
-
-const extensionId = 'AlgorandFoundation.algorand-python-vscode'
+import { getDocUri, waitForDocumentDiagnostics, doc } from 'common/test/helper'
 
 suite('Diagnostics', () => {
   const docUri = getDocUri('diagnostics.py')
@@ -20,7 +18,7 @@ suite('Diagnostics', () => {
 
   // Skip until code actions are available
   test.skip('Should fix the issue', async () => {
-    await activate(extensionId, docUri)
+    await waitForDocumentDiagnostics(docUri, 'puyapy-lsp')
 
     const range = toRange({ startLine: 7, startChar: 0, endLine: 7, endChar: 17 })
 
@@ -46,16 +44,11 @@ function toRange(params: { startLine: number; startChar: number; endLine: number
 }
 
 async function testDiagnostics(docUri: vscode.Uri, expectedDiagnostics: vscode.Diagnostic[]) {
-  await activate(extensionId, docUri)
+  const diagnostics = await waitForDocumentDiagnostics(docUri, 'puyapy-lsp')
 
-  const allDiagnostics = vscode.languages.getDiagnostics(docUri)
-  const actualDiagnostics = allDiagnostics.filter((diagnostic) => diagnostic.source === 'puyapy-lsp')
-
-  assert.equal(allDiagnostics.length > 0, true, 'No diagnostics found')
-  assert.equal(actualDiagnostics.length, expectedDiagnostics.length)
-
+  assert.equal(diagnostics.length, expectedDiagnostics.length)
   expectedDiagnostics.forEach((expectedDiagnostic, i) => {
-    const actualDiagnostic = actualDiagnostics[i]
+    const actualDiagnostic = diagnostics[i]
     assert.equal(actualDiagnostic.message, expectedDiagnostic.message)
     assert.deepEqual(actualDiagnostic.range, expectedDiagnostic.range)
     assert.equal(actualDiagnostic.severity, expectedDiagnostic.severity)

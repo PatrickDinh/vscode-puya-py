@@ -77,12 +77,9 @@ export abstract class LanguageClientManager {
 
     const client = this.clients.get(workspaceFolder.name)
     if (client) {
-      await client.stop(this.stopTimeout)
-      this.clients.delete(workspaceFolder.name)
+      await client.restart()
+      window.showInformationMessage(`${this.serverName} restarted successfully`)
     }
-
-    await this.startClient(workspaceFolder)
-    window.showInformationMessage(`${this.serverName} restarted successfully`)
   }
 
   public async stopClients(): Promise<void> {
