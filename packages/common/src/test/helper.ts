@@ -1,13 +1,15 @@
 import * as vscode from 'vscode'
 import * as path from 'path'
+import * as assert from 'assert'
 
 export let doc: vscode.TextDocument
 export let editor: vscode.TextEditor
 export let documentEol: string
 export let platformEol: string
 
-// TODO: NC - Readme doco
-export async function waitForDocumentDiagnostics(docUri: vscode.Uri, diagnosticSource: 'puyapy-lsp' | 'puyats-lsp') {
+type DiagnosticSource = 'puyapy' | 'puyats'
+
+export async function waitForDocumentDiagnostics(docUri: vscode.Uri, diagnosticSource: DiagnosticSource) {
   doc = await vscode.workspace.openTextDocument(docUri)
   editor = await vscode.window.showTextDocument(doc)
 
@@ -47,4 +49,23 @@ function getDocumentDiagnostics(docUri: vscode.Uri, diagnosticSource: string) {
       }
     }, 600)
   })
+}
+
+export async function testDiagnostics(docUri: vscode.Uri, diagnosticSource: DiagnosticSource, expectedDiagnostics: vscode.Diagnostic[]) {
+  const diagnostics = await waitForDocumentDiagnostics(docUri, diagnosticSource)
+
+  assert.equal(diagnostics.length, expectedDiagnostics.length)
+  expectedDiagnostics.forEach((expectedDiagnostic, i) => {
+    const actualDiagnostic = diagnostics[i]
+    assert.equal(actualDiagnostic.message, expectedDiagnostic.message)
+    assert.deepEqual(actualDiagnostic.range, expectedDiagnostic.range)
+    assert.equal(actualDiagnostic.severity, expectedDiagnostic.severity)
+  })
+}
+
+export function toRange(params: { startLine: number; startChar: number; endLine: number; endChar: number }) {
+  const { startLine, startChar, endLine, endChar } = params
+  const start = new vscode.Position(startLine, startChar)
+  const end = new vscode.Position(endLine, endChar)
+  return new vscode.Range(start, end)
 }

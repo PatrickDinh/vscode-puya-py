@@ -1,98 +1,73 @@
-import { workspace, WorkspaceFolder } from 'vscode'
-import { LanguageClientOptions, ServerOptions, TransportKind } from 'vscode-languageclient/node'
-import { exec } from 'child_process'
+import { WorkspaceFolder } from 'vscode'
+import { ServerOptions, TransportKind } from 'vscode-languageclient/node'
 import { PythonConfig, getPythonEnvironment } from './environment'
-import { LanguageClientManager } from 'common/language-client-manager'
+import { LanguageClientManager, OptionsResult } from 'common/language-client-manager'
 
-type ServerCommand = {
-  command: string
-  args?: string[]
-}
+// TODO: NC - How do we want to show a multi-root workspace in the output channel? How do other extensions handle this?
+// TODO: NC -Auto detect a AlgoKit project and enable the language server
+// TOOD: NC - Docs
 
 export class PythonLanguageClientManager extends LanguageClientManager {
   constructor() {
     super('Algorand Python', 'puyapy')
   }
 
-  private async tryToRunCommand(command: string): Promise<boolean> {
-    try {
-      await new Promise<void>((resolve, reject) => {
-        exec(command, (error: Error | null) => (error ? reject(error) : resolve()))
-      })
-      return true
-    } catch {
-      return false
-    }
-  }
-
-  private async findStartServerCommand(config: PythonConfig): Promise<ServerCommand | undefined> {
-    if (!config.pythonPath || !config.envPath) {
-      return undefined
+  private async resolveServerOptions(pythonConfig: PythonConfig): Promise<ServerOptions | undefined> {
+    const baseServerOptions = {
+      transport: TransportKind.stdio,
+      options: {
+        env: {
+          VIRTUAL_ENV: pythonConfig.envPath,
+          NO_COLOR: '1',
+          PYTHONUTF8: '1',
+        },
+      },
     }
 
-    const startWithPuyapyLsp = 'puyapy.lsp --help' // TODO: Switch to --version if/when supported
-
-    const startWithPython = `"${config.pythonPath}" -m ${startWithPuyapyLsp}`
-    if (await this.tryToRunCommand(startWithPython)) {
-      return {
-        command: config.pythonPath,
-        args: ['-m', 'puyapy.lsp'],
-      }
+    // If the language server is installed locally in a venv, then use it.
+    const locallyInstalledServerOptions: ServerOptions = {
+      ...baseServerOptions,
+      command: pythonConfig.pythonPath,
+      args: ['-m', 'puyapy.lsp'],
+    }
+    if (await this.commandSucceeds(locallyInstalledServerOptions)) {
+      return locallyInstalledServerOptions
     }
 
-    if (await this.tryToRunCommand(startWithPuyapyLsp)) {
-      return {
-        command: 'puyapy-lsp',
-      }
+    // If the language server available on the path, then use it.
+    const onPathServerOptions: ServerOptions = {
+      ...baseServerOptions,
+      command: 'puyapy-ls',
+    }
+    if (await this.commandSucceeds(onPathServerOptions)) {
+      return onPathServerOptions
     }
 
     return undefined
   }
 
-  protected async getOptions(workspaceFolder: WorkspaceFolder): Promise<[ServerOptions, LanguageClientOptions] | undefined> {
+  protected async getOptions(workspaceFolder: WorkspaceFolder): Promise<OptionsResult> {
     const pythonConfig = await getPythonEnvironment(workspaceFolder?.uri)
-    if (!pythonConfig?.envPath || !pythonConfig.pythonPath) {
-      throw new Error('Python configuration not found')
+    if (!pythonConfig) {
+      return { type: 'failure', message: 'Could not determine Python environment configuration.' }
     }
 
-    const config = workspace.getConfiguration('puyapy', workspaceFolder.uri)
-    let languageServerPath = config.get<string>('languageServerPath')
-    // Resolve ${workspaceFolder} if present
-    // Doesn't seems to be a better way to handle this
-    // https://github.com/microsoft/vscode/issues/46471
-    // likely we will need to use this https://github.com/DominicVonk/vscode-variables
-    // TODO: handle all predefined variables
-    if (languageServerPath?.includes('${workspaceFolder}')) {
-      languageServerPath = languageServerPath.replace('${workspaceFolder}', workspaceFolder.uri.fsPath)
+    const serverOptions = await this.resolveServerOptions(pythonConfig)
+
+    if (!serverOptions) {
+      return { type: 'failure', message: this.serverNotAvailableMessage }
     }
 
-    const startServerCommand = languageServerPath ? { command: 'puyapy-lsp' } : await this.findStartServerCommand(pythonConfig)
-
-    if (!startServerCommand) {
-      return undefined
-    }
-
-    return [
-      {
-        command: startServerCommand.command,
-        args: startServerCommand.args,
-        transport: TransportKind.stdio,
-        options: {
-          env: {
-            VIRTUAL_ENV: pythonConfig.envPath,
-            NO_COLOR: '1',
-            PYTHONUTF8: '1',
-          },
-          ...(languageServerPath && { cwd: languageServerPath }),
-        },
-      },
-      {
+    return {
+      type: 'success',
+      server: serverOptions,
+      client: {
         documentSelector: [{ language: 'python', pattern: `${workspaceFolder.uri.fsPath}/**/*` }],
         workspaceFolder: workspaceFolder,
         initializationOptions: {
           analysisPrefix: pythonConfig.envPath,
         },
       },
-    ]
+    }
   }
 }

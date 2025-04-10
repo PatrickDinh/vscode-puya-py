@@ -1,12 +1,12 @@
 import * as vscode from 'vscode'
 import * as assert from 'assert'
-import { getDocUri, waitForDocumentDiagnostics, doc } from 'common/test/helper'
+import { getDocUri, waitForDocumentDiagnostics, doc, testDiagnostics, toRange } from 'common/test/helper'
 
-suite('Diagnostics', () => {
+suite('diagnostics', () => {
   const docUri = getDocUri('diagnostics.py')
 
-  test('Should get diagnostics', async () => {
-    await testDiagnostics(docUri, [
+  test('should get diagnostics', async () => {
+    await testDiagnostics(docUri, 'puyapy', [
       {
         message: `Incompatible return value type (got "int", expected "UInt64")  [return-value]`,
         range: toRange({ startLine: 8, startChar: 0, endLine: 8, endChar: 17 }),
@@ -17,8 +17,8 @@ suite('Diagnostics', () => {
   })
 
   // Skip until code actions are available
-  test.skip('Should fix the issue', async () => {
-    await waitForDocumentDiagnostics(docUri, 'puyapy-lsp')
+  test.skip('should fix the issue', async () => {
+    await waitForDocumentDiagnostics(docUri, 'puyapy')
 
     const range = toRange({ startLine: 7, startChar: 0, endLine: 7, endChar: 17 })
 
@@ -35,22 +35,3 @@ suite('Diagnostics', () => {
     assert.equal(doc.getText(), 'a = arc4.Array([1, 2, 3])')
   })
 })
-
-function toRange(params: { startLine: number; startChar: number; endLine: number; endChar: number }) {
-  const { startLine, startChar, endLine, endChar } = params
-  const start = new vscode.Position(startLine, startChar)
-  const end = new vscode.Position(endLine, endChar)
-  return new vscode.Range(start, end)
-}
-
-async function testDiagnostics(docUri: vscode.Uri, expectedDiagnostics: vscode.Diagnostic[]) {
-  const diagnostics = await waitForDocumentDiagnostics(docUri, 'puyapy-lsp')
-
-  assert.equal(diagnostics.length, expectedDiagnostics.length)
-  expectedDiagnostics.forEach((expectedDiagnostic, i) => {
-    const actualDiagnostic = diagnostics[i]
-    assert.equal(actualDiagnostic.message, expectedDiagnostic.message)
-    assert.deepEqual(actualDiagnostic.range, expectedDiagnostic.range)
-    assert.equal(actualDiagnostic.severity, expectedDiagnostic.severity)
-  })
-}

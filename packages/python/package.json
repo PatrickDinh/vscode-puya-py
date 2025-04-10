@@ -29,10 +29,10 @@
   ],
   "repository": {
     "type": "git",
-    "url": "https://github.com/neilcampbell/vscode-puya-py.git"
+    "url": "https://github.com/algorandfoundation/algokit-languages-vscode.git"
   },
   "bugs": {
-    "url": "https://github.com/neilcampbell/vscode-puya-py/issues"
+    "url": "https://github.com/algorandfoundation/algokit-languages-vscode/issues"
   },
   "scripts": {
     "lint": "eslint src -c ../common/eslint.config.mjs",
@@ -57,10 +57,13 @@
     "@vscode/python-extension": "^1.0.5"
   },
   "devDependencies": {},
+  "extensionDependencies": [
+    "ms-python.python"
+  ],
   "main": "./dist/extension.js",
   "activationEvents": [
     "onLanguage:python",
-    "onCommand:extension.algorandPython.restartLanguageServer"
+    "onCommand:extension.languageServer.restart"
   ],
   "workspaceTrust": {
     "request": "never"
@@ -68,7 +71,7 @@
   "contributes": {
     "commands": [
       {
-        "command": "algorandPython.restartLanguageServer",
+        "command": "algorandPython.languageServer.restart",
         "title": "Restart Language Server",
         "category": "Algorand Python"
       }
@@ -76,14 +79,14 @@
     "configuration": {
       "title": "Algorand Python",
       "properties": {
-        "algorandPython.languageServerPath": {
-          "scope": "machine-overridable",
+        "algorandPython.languageServer.enable": {
+          "scope": "window",
           "type": [
-            "string",
+            "boolean",
             "null"
           ],
           "default": null,
-          "description": "Optional path to the directory containing the PuyaPy language server."
+          "description": "Controls if the language server should be enabled."
         }
       }
     }

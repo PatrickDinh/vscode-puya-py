@@ -4,20 +4,19 @@ import { PythonLanguageClientManager } from './language-client-manager'
 
 const clientManager = new PythonLanguageClientManager()
 
-async function onDocumentOpenedHandler(context: ExtensionContext, document: TextDocument) {
+const extensionNamespace = 'algorandPython'
+const languageServerEnableConfigId = 'languageServer.enable'
+const languageServerRestartCommandId = 'languageServer.restart'
+
+async function onDocumentOpenedHandler(_: ExtensionContext, document: TextDocument) {
   if (document.languageId === 'python') {
     const folder = workspace.getWorkspaceFolder(document.uri)
     if (folder) {
-      await clientManager.startClient(folder)
-
-      // Handle language server path configuration changes
-      context.subscriptions.push(
-        workspace.onDidChangeConfiguration(async (event) => {
-          if (event.affectsConfiguration('algorandPython.languageServerPath', folder)) {
-            await clientManager.restartClient(folder)
-          }
-        })
-      )
+      const config = workspace.getConfiguration(extensionNamespace, folder.uri)
+      const enabled = config.get<boolean | null>(languageServerEnableConfigId) ?? false
+      if (enabled) {
+        await clientManager.startClient(folder)
+      }
     }
   }
 }
@@ -29,21 +28,15 @@ async function onPythonEnvironmentChangedHandler(resource: Uri) {
   }
 }
 
-async function restartLanguageServerCommand() {
+async function restartLanguageClientCommand() {
   const editor = window.activeTextEditor
-  if (!editor) {
-    window.showErrorMessage('No active editor found')
-    return
-  }
-
-  const folder = workspace.getWorkspaceFolder(editor.document.uri)
-  if (!folder) {
-    window.showErrorMessage('No workspace folder found for the current file')
+  const folder = editor ? workspace.getWorkspaceFolder(editor.document.uri) : undefined
+  if (!editor || !folder) {
+    await clientManager.restartClients()
     return
   }
 
   await clientManager.restartClient(folder)
-  window.showInformationMessage('Algorand Python language server restarted successfully')
 }
 
 export async function activate(context: ExtensionContext) {
@@ -51,7 +44,9 @@ export async function activate(context: ExtensionContext) {
   const pythonApi = await PythonExtension.api()
 
   // Register restart command
-  context.subscriptions.push(commands.registerCommand('algorandPython.restartLanguageServer', restartLanguageServerCommand))
+  context.subscriptions.push(
+    commands.registerCommand(`${extensionNamespace}.${languageServerRestartCommandId}`, restartLanguageClientCommand)
+  )
 
   // Handle already opened documents
   if (window.activeTextEditor?.document) {
@@ -81,6 +76,24 @@ export async function activate(context: ExtensionContext) {
       for (const folder of event.removed) {
         await clientManager.restartClient(folder)
       }
+    })
+  )
+
+  // Handle config changes
+  context.subscriptions.push(
+    workspace.onDidChangeConfiguration(async (event) => {
+      clientManager.managedWorkspaces().forEach(async (workspaceFolder) => {
+        if (event.affectsConfiguration(`${extensionNamespace}.${languageServerEnableConfigId}`, workspaceFolder)) {
+          const config = workspace.getConfiguration(extensionNamespace, workspaceFolder.uri)
+          let enabled = config.get<boolean | null>(languageServerEnableConfigId) ?? false
+
+          if (enabled) {
+            await clientManager.startClient(workspaceFolder)
+          } else {
+            await clientManager.stopClient(workspaceFolder)
+          }
+        }
+      })
     })
   )
 }

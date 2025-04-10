@@ -29,10 +29,10 @@
   ],
   "repository": {
     "type": "git",
-    "url": "https://github.com/neilcampbell/vscode-puya-py.git"
+    "url": "https://github.com/algorandfoundation/algokit-languages-vscode.git"
   },
   "bugs": {
-    "url": "https://github.com/neilcampbell/vscode-puya-py/issues"
+    "url": "https://github.com/algorandfoundation/algokit-languages-vscode/issues"
   },
   "scripts": {
     "lint": "eslint src -c ../common/eslint.config.mjs",
@@ -57,7 +57,7 @@
   "main": "dist/extension.js",
   "activationEvents": [
     "onLanguage:typescript",
-    "onCommand:extension.algorandTypescript.restartLanguageClient"
+    "onCommand:extension.algorandTypeScript.languageServer.restart"
   ],
   "workspaceTrust": {
     "request": "never"
@@ -65,7 +65,7 @@
   "contributes": {
     "commands": [
       {
-        "command": "algorandTypescript.restartLanguageClient",
+        "command": "algorandTypeScript.languageServer.restart",
         "title": "Restart Server",
         "category": "Algorand TypeScript"
       }
@@ -73,14 +73,14 @@
     "configuration": {
       "title": "Algorand TypeScript",
       "properties": {
-        "algorandTypescript.languageServerPath": {
-          "scope": "machine-overridable",
+        "algorandTypeScript.languageServer.enable": {
+          "scope": "window",
           "type": [
-            "string",
+            "boolean",
             "null"
           ],
           "default": null,
-          "description": "Optional path to the directory containing the PuyaTS language server."
+          "description": "Controls if the language server should be enabled."
         }
       }
     }

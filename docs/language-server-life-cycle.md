@@ -23,18 +23,18 @@ The extension manages language server instances on a per-workspace folder basis.
    a. **First Attempt**: Try as a Python module
 
    ```bash
-   python -m puyapy.lsp --version
+   python -m puyapy.ls --version
    ```
 
-   If successful, will use: `pythonPath -m puyapy.lsp`
+   If successful, will use: `pythonPath -m puyapy.ls`
 
    b. **Second Attempt**: Try as a global command
 
    ```bash
-   puyapy-lsp --version
+   puyapy-ls --version
    ```
 
-   If successful, will use: `puyapy-lsp`
+   If successful, will use: `puyapy-ls`
 
 4. **Server Initialization**
    - Creates a new Language Client with:

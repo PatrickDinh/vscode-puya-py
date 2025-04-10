@@ -13,8 +13,8 @@
       "args": ["--extensionDevelopmentPath=${workspaceFolder}", "${workspaceFolder}/examples/algorand-typescript"],
       "outFiles": ["${workspaceFolder}/dist/extension.js"],
       "autoAttachChildProcesses": true,
-      "preLaunchTask": "npm: build:dev",
-      // "env": { "ALGORAND_LSP_PORT": "8888" }
+      "preLaunchTask": "npm: build:dev"
+      // "env": { "ALGORAND_LS_PORT": "8888" }
     },
     {
       "name": "Launch TypeScript",
@@ -24,8 +24,8 @@
       "args": ["--extensionDevelopmentPath=${workspaceFolder}", "${workspaceFolder}/examples/typescript"],
       "outFiles": ["${workspaceFolder}/dist/extension.js"],
       "autoAttachChildProcesses": true,
-      "preLaunchTask": "npm: build:dev",
-      // "env": { "ALGORAND_LSP_PORT": "8888" }
+      "preLaunchTask": "npm: build:dev"
+      // "env": { "ALGORAND_LS_PORT": "8888" }
     },
     {
       "name": "Debug Tests",
@@ -40,8 +40,8 @@
       ],
       "outFiles": ["${workspaceFolder}/out/**/*.js"],
       "autoAttachChildProcesses": true,
-      "preLaunchTask": "npm: pretest",
-      // "env": { "ALGORAND_LSP_PORT": "8888" }
+      "preLaunchTask": "npm: pretest"
+      // "env": { "ALGORAND_LS_PORT": "8888" }
     }
   ]
 }

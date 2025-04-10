@@ -7,7 +7,7 @@ export type PythonConfig = {
   /*
    * Path to the Python executable, undefined if no executable found
    */
-  pythonPath?: string
+  pythonPath: string
 }
 
 export async function getPythonEnvironment(resource?: Uri): Promise<PythonConfig | undefined> {
@@ -17,10 +17,17 @@ export async function getPythonEnvironment(resource?: Uri): Promise<PythonConfig
     return undefined
   }
 
+  const envPath = resolvedEnvironment.executable.sysPrefix
+  const pythonPath = resolvedEnvironment.executable.uri?.fsPath
+
+  if (!envPath || !pythonPath) {
+    return undefined
+  }
+
   return {
     id: resolvedEnvironment.id,
     // We don't use resolvedEnvironment.environment.folderUri.fsPath here because it won't be set for global env
-    envPath: resolvedEnvironment.executable.sysPrefix,
-    pythonPath: resolvedEnvironment.executable.uri?.fsPath,
+    envPath,
+    pythonPath,
   }
 }

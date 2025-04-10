@@ -1,0 +1,23 @@
+{
+  "name": "test_workspace",
+  "version": "1.0.0",
+  "description": "Test workspace",
+  "scripts": {
+    "build": "puya-ts . --output-source-map --out-dir artifacts"
+  },
+  "engines": {
+    "node": ">=22.0",
+    "npm": ">=9.0"
+  },
+  "dependencies": {
+    "@algorandfoundation/algorand-typescript": "^1.0.0-beta.68"
+  },
+  "devDependencies": {
+    "@algorandfoundation/puya-ts": "^1.0.0-beta.68",
+    "@tsconfig/node22": "^22.0.0",
+    "typescript": "^5.7.3"
+  },
+  "overrides": {
+    "esbuild": "0.25.0"
+  }
+}

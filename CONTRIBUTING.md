@@ -33,7 +33,7 @@
 
 ### Debug the Language Server Client and Language Server
 
-1. Uncomment `"env": { "ALGORAND_LSP_PORT": "8888" }` in `launch.json` located in the `python` or `typescript` package workspace `.vscode` directory.
+1. Uncomment `"env": { "ALGORAND_LS_PORT": "8888" }` in `launch.json` located in the `python` or `typescript` package workspace `.vscode` directory.
 1. Run the relevant language server bound on port `8888`.
 1. Run `npm i` inside the `avm-debugger` repository to install the dependencies.
 1. Open the `avm-debugger` repository root in VS Code.
