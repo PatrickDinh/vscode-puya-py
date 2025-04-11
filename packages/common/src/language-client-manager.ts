@@ -45,11 +45,14 @@ export abstract class LanguageClientManager {
   protected abstract getOptions(workspaceFolder: WorkspaceFolder, outputChannel: OutputChannel): Promise<OptionsResult>
 
   public async startClient(workspaceFolder: WorkspaceFolder) {
-    if (this.workspaceContext.has(workspaceFolder.name) && this.workspaceContext.get(workspaceFolder.name)!.client) {
+    const context = this.workspaceContext.get(workspaceFolder.name)
+
+    if (context && context.client) {
       return
     }
 
-    const outputChannel = window.createOutputChannel(`${this.serverName}${workspaceFolder.name ? ` - ${workspaceFolder.name}` : ''}`)
+    const outputChannel =
+      context?.outputChannel ?? window.createOutputChannel(`${this.serverName}${workspaceFolder.name ? ` - ${workspaceFolder.name}` : ''}`)
     const options = await this.getOptions(workspaceFolder, outputChannel)
 
     if (options.type === 'failure') {
@@ -62,8 +65,11 @@ export abstract class LanguageClientManager {
     clientOptions.outputChannel = outputChannel
 
     if (this.lspPort) {
-      const transport = createServerSocketTransport(this.lspPort)
-      serverOptions = async () => ({ reader: transport[0], writer: transport[1] })
+      const lspPort = this.lspPort
+      serverOptions = async () => {
+        const transport = createServerSocketTransport(lspPort)
+        return { reader: transport[0], writer: transport[1] }
+      }
       clientOptions.errorHandler = {
         error: () => ({ action: ErrorAction.Continue, handled: true }),
         closed: () => ({ action: CloseAction.Restart, handled: true }),
