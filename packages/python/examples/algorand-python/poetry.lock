@@ -563,7 +563,6 @@ typing-extensions = "^4.11.0"
 type = "git"
 url = "https://github.com/algorandfoundation/puya.git"
 reference = "lsp-poc"
-resolved_reference = "d6cb96e8a94b0a325f729982a1b2ac78cacaa941"
 
 [[package]]
 name = "py-algorand-sdk"

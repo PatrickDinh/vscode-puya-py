@@ -15,6 +15,7 @@
     "typescript",
     "algokit algorand typescript",
     "puya",
+    "puya-ts",
     "puyats",
     "algorand smart contracts"
   ],
@@ -28,10 +29,10 @@
   ],
   "repository": {
     "type": "git",
-    "url": "https://github.com/neilcampbell/vscode-puya-py.git"
+    "url": "https://github.com/algorandfoundation/algokit-languages-vscode.git"
   },
   "bugs": {
-    "url": "https://github.com/neilcampbell/vscode-puya-py/issues"
+    "url": "https://github.com/algorandfoundation/algokit-languages-vscode/issues"
   },
   "scripts": {
     "lint": "eslint src -c ../common/eslint.config.mjs",
@@ -45,7 +46,8 @@
     "pretest": "run-s pretest:*",
     "pretest:build-extension": "npm run build:dev",
     "pretest:clean": "rimraf out",
-    "pretest:build-tests": "tsc --outDir out && tsc-alias --outDir out",
+    "pretest:setup-workspace": "cd ./src/test/workspace && npm install && cd ../../../",
+    "pretest:build-tests": "tsc -p tsconfig.test.json --outDir out && tsc-alias --outDir out",
     "test": "cross-env CODE_TESTS_WORKSPACE=\"src/test/workspace\" node \"out/typescript/src/test/index\"",
     "create-release": "semantic-release-monorepo",
     "pre-commit": "run-s build:check-types lint:fix audit test",
@@ -56,7 +58,7 @@
   "main": "dist/extension.js",
   "activationEvents": [
     "onLanguage:typescript",
-    "onCommand:extension.algorandTypescript.restartLanguageClient"
+    "onCommand:extension.algorandTypeScript.languageServer.restart"
   ],
   "workspaceTrust": {
     "request": "never"
@@ -64,7 +66,7 @@
   "contributes": {
     "commands": [
       {
-        "command": "algorandTypescript.restartLanguageClient",
+        "command": "algorandTypeScript.languageServer.restart",
         "title": "Restart Server",
         "category": "Algorand TypeScript"
       }
@@ -72,14 +74,14 @@
     "configuration": {
       "title": "Algorand TypeScript",
       "properties": {
-        "algorandTypescript.languageServerPath": {
-          "scope": "machine-overridable",
+        "algorandTypeScript.languageServer.enable": {
+          "scope": "window",
           "type": [
-            "string",
+            "boolean",
             "null"
           ],
           "default": null,
-          "description": "Optional path to the directory containing the PuyaTS language server."
+          "description": "Controls if the language server should be enabled."
         }
       }
     }

@@ -1,21 +1,22 @@
-import { workspace, ExtensionContext, window, TextDocument, Uri, commands } from 'vscode'
+import { workspace, ExtensionContext, window, TextDocument, commands, Uri } from 'vscode'
 import { PythonExtension } from '@vscode/python-extension'
-import { startLanguageServer, restartLanguageServer, stopAllLanguageServers } from './language-server'
+import { PythonLanguageClientManager } from './language-client-manager'
 
-async function onDocumentOpenedHandler(context: ExtensionContext, document: TextDocument) {
+const clientManager = new PythonLanguageClientManager()
+
+const extensionNamespace = 'algorandPython'
+const languageServerEnableConfigId = 'languageServer.enable'
+const languageServerRestartCommandId = 'languageServer.restart'
+
+async function onDocumentOpenedHandler(_: ExtensionContext, document: TextDocument) {
   if (document.languageId === 'python') {
     const folder = workspace.getWorkspaceFolder(document.uri)
     if (folder) {
-      await startLanguageServer(folder)
-
-      // Handle language server path configuration changes
-      context.subscriptions.push(
-        workspace.onDidChangeConfiguration(async (event) => {
-          if (event.affectsConfiguration('algorandPython.languageServerPath', folder)) {
-            await restartLanguageServer(folder)
-          }
-        })
-      )
+      const config = workspace.getConfiguration(extensionNamespace, folder.uri)
+      const enabled = config.get<boolean | null>(languageServerEnableConfigId) ?? false
+      if (enabled) {
+        await clientManager.startClient(folder)
+      }
     }
   }
 }
@@ -23,25 +24,19 @@ async function onDocumentOpenedHandler(context: ExtensionContext, document: Text
 async function onPythonEnvironmentChangedHandler(resource: Uri) {
   const folder = workspace.getWorkspaceFolder(resource)
   if (folder) {
-    await restartLanguageServer(folder)
+    await clientManager.restartClient(folder)
   }
 }
 
-async function restartLanguageServerCommand() {
+async function restartLanguageClientCommand() {
   const editor = window.activeTextEditor
-  if (!editor) {
-    window.showErrorMessage('No active editor found')
+  const folder = editor ? workspace.getWorkspaceFolder(editor.document.uri) : undefined
+  if (!editor || !folder) {
+    await clientManager.restartClients()
     return
   }
 
-  const folder = workspace.getWorkspaceFolder(editor.document.uri)
-  if (!folder) {
-    window.showErrorMessage('No workspace folder found for the current file')
-    return
-  }
-
-  await restartLanguageServer(folder)
-  window.showInformationMessage('Algorand Python language server restarted successfully')
+  await clientManager.restartClient(folder)
 }
 
 export async function activate(context: ExtensionContext) {
@@ -49,7 +44,9 @@ export async function activate(context: ExtensionContext) {
   const pythonApi = await PythonExtension.api()
 
   // Register restart command
-  context.subscriptions.push(commands.registerCommand('algorandPython.restartLanguageServer', restartLanguageServerCommand))
+  context.subscriptions.push(
+    commands.registerCommand(`${extensionNamespace}.${languageServerRestartCommandId}`, restartLanguageClientCommand)
+  )
 
   // Handle already opened documents
   if (window.activeTextEditor?.document) {
@@ -77,12 +74,30 @@ export async function activate(context: ExtensionContext) {
   context.subscriptions.push(
     workspace.onDidChangeWorkspaceFolders(async (event) => {
       for (const folder of event.removed) {
-        await restartLanguageServer(folder)
+        await clientManager.restartClient(folder)
       }
+    })
+  )
+
+  // Handle config changes
+  context.subscriptions.push(
+    workspace.onDidChangeConfiguration(async (event) => {
+      clientManager.managedWorkspaces().forEach(async (workspaceFolder) => {
+        if (event.affectsConfiguration(`${extensionNamespace}.${languageServerEnableConfigId}`, workspaceFolder)) {
+          const config = workspace.getConfiguration(extensionNamespace, workspaceFolder.uri)
+          const enabled = config.get<boolean | null>(languageServerEnableConfigId) ?? false
+
+          if (enabled) {
+            await clientManager.startClient(workspaceFolder)
+          } else {
+            await clientManager.stopClient(workspaceFolder)
+          }
+        }
+      })
     })
   )
 }
 
 export async function deactivate(): Promise<void> {
-  await stopAllLanguageServers()
+  await clientManager.stopClients()
 }

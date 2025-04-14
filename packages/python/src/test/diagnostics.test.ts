@@ -1,28 +1,26 @@
 import * as vscode from 'vscode'
 import * as assert from 'assert'
-import { getDocUri, activate, doc } from 'common/test/helper'
+import { getDocUri, waitForDocumentDiagnostics, doc, testDiagnostics, toRange } from 'common/test/helper'
 
-const extensionId = 'AlgorandFoundation.algorand-typescript-vscode'
-
-// Skip until we integrate with pupapy
-suite.skip('Diagnostics', () => {
+suite('diagnostics', () => {
   const docUri = getDocUri('diagnostics.py')
 
-  test('Should get diagnostics', async () => {
-    await testDiagnostics(docUri, [
+  test('should get diagnostics', async () => {
+    await testDiagnostics(docUri, 'puyapy', [
       {
-        message: "Python list isn't supported in Algorand Python",
-        range: toRange(0, 4, 0, 9),
+        message: `Incompatible return value type (got "int", expected "UInt64")  [return-value]`,
+        range: toRange({ startLine: 8, startChar: 0, endLine: 8, endChar: 17 }),
         severity: vscode.DiagnosticSeverity.Error,
         source: 'ex',
       },
     ])
   })
 
-  test('Should fix the issue', async () => {
-    await activate(extensionId, docUri)
+  // Skip until code actions are available
+  test.skip('should fix the issue', async () => {
+    await waitForDocumentDiagnostics(docUri, 'puyapy')
 
-    const range = toRange(0, 4, 0, 9)
+    const range = toRange({ startLine: 7, startChar: 0, endLine: 7, endChar: 17 })
 
     // Execute the code action provider command to retrieve action list.
     const codeActions = await vscode.commands.executeCommand<vscode.CodeAction[]>(
@@ -37,23 +35,3 @@ suite.skip('Diagnostics', () => {
     assert.equal(doc.getText(), 'a = arc4.Array([1, 2, 3])')
   })
 })
-
-function toRange(sLine: number, sChar: number, eLine: number, eChar: number) {
-  const start = new vscode.Position(sLine, sChar)
-  const end = new vscode.Position(eLine, eChar)
-  return new vscode.Range(start, end)
-}
-
-async function testDiagnostics(docUri: vscode.Uri, expectedDiagnostics: vscode.Diagnostic[]) {
-  await activate(extensionId, docUri)
-
-  const actualDiagnostics = vscode.languages.getDiagnostics(docUri)
-  assert.equal(actualDiagnostics.length, expectedDiagnostics.length)
-
-  expectedDiagnostics.forEach((expectedDiagnostic, i) => {
-    const actualDiagnostic = actualDiagnostics[i]
-    assert.equal(actualDiagnostic.message, expectedDiagnostic.message)
-    assert.deepEqual(actualDiagnostic.range, expectedDiagnostic.range)
-    assert.equal(actualDiagnostic.severity, expectedDiagnostic.severity)
-  })
-}

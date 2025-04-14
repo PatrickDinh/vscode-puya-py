@@ -11,8 +11,7 @@ esbuild.mjs
 **/*.ts
 **/.vscode-test.*
 examples
-images/**/*
-!images/icon.png
+docs/**/*
 release.config.mjs
 ../../**
 ../**

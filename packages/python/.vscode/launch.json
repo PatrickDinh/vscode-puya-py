@@ -5,34 +5,26 @@
 {
   "version": "0.2.0",
   "configurations": [
-
     {
       "name": "Launch Algorand Python",
       "type": "extensionHost",
       "request": "launch",
-      "args": [
-        "--extensionDevelopmentPath=${workspaceFolder}",
-        "--testing=hello",
-        "${workspaceFolder}/examples/algorand-python"
-      ],
+      "args": ["--extensionDevelopmentPath=${workspaceFolder}", "${workspaceFolder}/examples/algorand-python"],
       "outFiles": ["${workspaceFolder}/dist/extension.js"],
       "autoAttachChildProcesses": true,
-      "preLaunchTask": "npm: build:dev",
-      // "env": { "ALGORAND_LSP_PORT": "8888" }
+      "preLaunchTask": "npm: build:dev"
+      // "env": { "ALGORAND_LS_PORT": "8888" }
     },
     {
       "name": "Launch Python",
       "type": "extensionHost",
       "request": "launch",
       "runtimeExecutable": "${execPath}",
-      "args": [
-        "--extensionDevelopmentPath=${workspaceFolder}",
-        "${workspaceFolder}/examples/python"
-      ],
+      "args": ["--extensionDevelopmentPath=${workspaceFolder}", "${workspaceFolder}/examples/python"],
       "outFiles": ["${workspaceFolder}/dist/extension.js"],
       "autoAttachChildProcesses": true,
-      "preLaunchTask": "npm: build:dev",
-      // "env": { "ALGORAND_LSP_PORT": "8888" }
+      "preLaunchTask": "npm: build:dev"
+      // "env": { "ALGORAND_LS_PORT": "8888" }
     },
     {
       "name": "Debug Tests",
@@ -42,11 +34,13 @@
       "args": [
         "--extensionDevelopmentPath=${workspaceFolder}",
         "--extensionTestsPath=${workspaceFolder}/out/common/src/test/run",
+        "--disable-extension=vsls-contrib.codetour",
         "${workspaceFolder}/src/test/workspace"
       ],
       "outFiles": ["${workspaceFolder}/out/**/*.js"],
-      "preLaunchTask": "npm: pretest",
-      // "env": { "ALGORAND_LSP_PORT": "8888" }
+      "autoAttachChildProcesses": true,
+      "preLaunchTask": "npm: pretest"
+      // "env": { "ALGORAND_LS_PORT": "8888" }
     }
   ]
 }

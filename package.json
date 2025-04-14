@@ -6,7 +6,7 @@
   "version": "0.0.1",
   "repository": {
     "type": "git",
-    "url": "https://github.com/PatrickDinh/vscode-puya-py"
+    "url": "https://github.com/algorandfoundation/algokit-languages-vscode.git"
   },
   "workspaces": [
     "packages/*"
