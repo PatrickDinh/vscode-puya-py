@@ -1,5 +1,5 @@
 .vscode/**
-.vscode-test/**
+.vstest/**
 out/**
 node_modules
 src/**/*
@@ -9,7 +9,7 @@ esbuild.mjs
 **/tsconfig.json
 **/*.map
 **/*.ts
-**/.vscode-test.*
+**/.vstest.*
 examples
 docs/**/*
 release.config.mjs

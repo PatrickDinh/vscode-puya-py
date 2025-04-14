@@ -2,7 +2,7 @@ import * as path from 'path'
 import { runVSCodeCommand, runTests as runVSCodeTests } from '@vscode/test-electron'
 import './run' // Importing the module to ensure it's included in the bundle
 
-const installPath = path.resolve('../../.vscode-test')
+const installPath = path.resolve('../../.vstest')
 
 export async function runTests(language: 'python' | 'typescript') {
   try {
