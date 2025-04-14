@@ -42,7 +42,7 @@ This extension depends on the official [Python extension for Visual Studio Code]
 
 This extension exposes the following settings:
 
-- `algorandPython.languageServerPath`: An absolute path to the [PuyaPy](https://pypi.org/project/puyapy/) package location on your system (e.g. `/Users/me/.local/bin/`). The PuyaPy package ships the language server component, which this extension leverages. If blank, the extension will try to automatically resolve the most applicable PuyaPy package available on your system.
+- `algorandPython.languageServer.enable`: Enables the Algorand Python language server. By default the language server is disabled.
 
 ## Working with Python Smart Contracts
 

@@ -5,7 +5,7 @@ import { LanguageClientManager, OptionsResult } from 'common/language-client-man
 
 // TODO: NC - How do we want to show a multi-root workspace in the output channel? How do other extensions handle this?
 // TODO: NC -Auto detect a AlgoKit project and enable the language server
-// TOOD: NC - Docs
+// TODO: NC - Docs
 
 export class PythonLanguageClientManager extends LanguageClientManager {
   constructor() {

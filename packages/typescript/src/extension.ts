@@ -64,7 +64,7 @@ export async function activate(context: ExtensionContext) {
       clientManager.managedWorkspaces().forEach(async (workspaceFolder) => {
         if (event.affectsConfiguration(`${extensionNamespace}.${languageServerEnableConfigId}`, workspaceFolder)) {
           const config = workspace.getConfiguration(extensionNamespace, workspaceFolder.uri)
-          let enabled = config.get<boolean | null>(languageServerEnableConfigId) ?? false
+          const enabled = config.get<boolean | null>(languageServerEnableConfigId) ?? false
 
           if (enabled) {
             await clientManager.startClient(workspaceFolder)
